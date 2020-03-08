@@ -4,7 +4,8 @@ TARGET=vebtree_test
 
 INCS= \
 Set.hpp \
-vEBTree.hpp
+vEBTree.hpp \
+RSvEBTree.hpp
 
 SRCS= \
 vebtree_test.cpp

@@ -1,6 +1,7 @@
 #include "vEBTree.hpp"
 #include <bits/stdc++.h>
 #include "Set.hpp"
+#include "RSvEBTree.hpp"
 
 using namespace std;
 
@@ -29,11 +30,8 @@ struct ScopedProf {
   } while (0)
 
 template <class T, template <class> class Tree>
-void test() {
+void test(const size_t limit_lg2, const size_t N) {
   using TTree = Tree<T>;
-
-  const size_t N = 10000;
-  const size_t limit_lg2 = 20;
   const size_t limit = 1ll << limit_lg2;
 
   uniform_int_distribution<T> dist;
@@ -100,12 +98,17 @@ void test() {
 
 int main() {
   cout << "Test Set ..." << endl;
-  test<int, Set>();
+  test<int, Set>(60, 10000);
   cout << "PASSED!" << endl << endl;
 
+  //! test small size (u = 2^20), because vEBTree requires O(u) space
   cout << "Test vEBTree ..." << endl;
-  test<int, vEBTree>();
-  cout << "PASSED" << endl << endl;
+  test<int, vEBTree>(20, 10000);
+  cout << "PASSED!" << endl << endl;
+
+  cout << "Test RS-vEBTree ..." << endl;
+  test<long long, RSvEBTree>(60, 10000);
+  cout << "PASSED!" << endl << endl;
 
   return 0;
 }
