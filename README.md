@@ -8,12 +8,12 @@
 ## Benchmark
 
 * command: `make && ./vebtree_test bench`
-
 * Compiler: g++ (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
 * Arch: Windows10 64bit, Intel(R) Core(TM) i5-8500 CPU
 * RAM: 16GB
 
-* 1000000 operations (0 <= key < 2^20)
+
+1000000 operations (0 <= key < 2^20)
 
 | Algorithm | insert | lookup (almost miss) | lookup (always hit) | upper_bound | erase |
 | --------- | ------ | -------------------- | ------------------- | ----------- | ----- |
@@ -21,7 +21,8 @@
 | vEBTree   | 398    | 333                  | 407                 | 390         | 399   |
 | RSvEBTree | 1202   | 821                  | 887                 | 989         | 1100  |
 
-* 10000000 operations  (0 <= key < 2^40)
+
+10000000 operations  (0 <= key < 2^40)
 
 | Algorithm | insert | lookup (almost miss) | lookup (always hit) | upper_bound | erase |
 | --------- | ------ | -------------------- | ------------------- | ----------- | ----- |
