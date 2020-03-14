@@ -1,4 +1,4 @@
-CFLAGS=-I. -g -Wall -Werror -O2 -g
+CFLAGS=-I. -g -Wall -Werror -O3 -g
 CXXFLAGS=${CFLAGS} -std=c++17
 TARGET=vebtree_test
 

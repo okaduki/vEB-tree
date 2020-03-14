@@ -96,19 +96,117 @@ void test(const size_t limit_lg2, const size_t N) {
   }
 }
 
-int main() {
-  cout << "Test Set ..." << endl;
-  test<int, Set>(60, 10000);
-  cout << "PASSED!" << endl << endl;
 
-  //! test small size (u = 2^20), because vEBTree requires O(u) space
-  cout << "Test vEBTree ..." << endl;
-  test<int, vEBTree>(20, 10000);
-  cout << "PASSED!" << endl << endl;
+template <class T, template <class> class Tree>
+void benchmark(const size_t limit_lg2, const size_t N) {
+  using TTree = Tree<T>;
+  const size_t limit = 1ll << limit_lg2;
 
-  cout << "Test RS-vEBTree ..." << endl;
-  test<long long, RSvEBTree>(60, 10000);
-  cout << "PASSED!" << endl << endl;
+  uniform_int_distribution<T> dist;
+  auto engine = mt19937(123);
+
+  vector<T> nums;
+  nums.reserve(N);
+  {
+    set<T> memo;
+    while (nums.size() < N) {
+      auto x = dist(engine) % limit;
+      if (memo.count(x)) continue;
+
+      nums.emplace_back(x);
+      memo.insert(x);
+    }
+  }
+
+  TTree tree(limit_lg2);
+  // insert
+  {
+    ScopedProf prof("insert (" + to_string(N) + " ops)");
+    for(size_t i = 0; i < N; ++i){
+      tree.insert(nums[i]);
+    }
+  }
+
+  // lookup
+  {
+    ScopedProf prof("lookup (almost miss)(" + to_string(N) + " ops)");
+    for(size_t i = 0; i < N; ++i){
+      auto x = dist(engine) % limit;
+      tree.lookup(x);
+    }
+  }
+
+  {
+    ScopedProf prof("lookup (always hit)(" + to_string(N) + " ops)");
+    for(size_t i = 0; i < N; ++i){
+      auto idx = dist(engine) % N;
+      tree.lookup(nums[idx]);
+    }
+  }
+
+  // upper_bound (successor)
+  {
+    ScopedProf prof("upper_bound (" + to_string(N) + " ops)");
+    for(size_t i = 0; i < N; ++i){
+      auto x = dist(engine) % limit;
+      tree.upper_bound(x);
+    }
+  }
+
+  // erase
+  {
+    ScopedProf prof("erase (" + to_string(N) + " ops)");
+    for(size_t i = 0; i < N; ++i){
+      tree.erase(nums[i]);
+    }
+  }
+}
+
+
+int main(int argc, char *argv[]) {
+  if(argc < 2) {
+    cout << "usage: ./vebtree_test [test,bench]" << endl;
+    return 0;
+  }
+
+  if(string(argv[1]) == "test") {
+    cout << "Test Set ..." << endl;
+    test<int, Set>(60, 10000);
+    cout << "PASSED!" << endl << endl;
+
+    //! test small size (u = 2^20), because vEBTree requires O(u) space
+    cout << "Test vEBTree ..." << endl;
+    test<int, vEBTree>(20, 10000);
+    cout << "PASSED!" << endl << endl;
+
+    cout << "Test RS-vEBTree ..." << endl;
+    test<long long, RSvEBTree>(60, 10000);
+    cout << "PASSED!" << endl << endl;
+  }
+  else if(string(argv[1]) == "bench") {
+    const int low = 20;
+    const int low_ops = 1'000'000;
+    const int high = 40;
+    const int high_ops = 10'000'000;
+
+    cout << "== Set ==" << endl;
+    benchmark<int, Set>(low, low_ops);
+
+    cout << "== vEBTree ==" << endl;
+    benchmark<int, vEBTree>(low, low_ops);
+
+    cout << "== RSvEBTree ==" << endl;
+    benchmark<int, RSvEBTree>(low, low_ops);
+
+    cout << "== Set ==" << endl;
+    benchmark<long long, Set>(high, high_ops);
+
+    cout << "== RSvEBTree ==" << endl;
+    benchmark<long long, RSvEBTree>(high, high_ops);
+  }
+  else {
+    cout << "unknown option" << endl;
+  }
 
   return 0;
 }
